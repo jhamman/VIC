@@ -253,12 +253,15 @@ double solve_snow(char                 overstory,
 
 	(*ShortUnderIn) *= (*surf_atten);  // SW transmitted through canopy
 	ShortOverIn      = (1. - (*surf_atten)) * shortwave; // canopy incident SW
-	ErrorFlag = snow_intercept((double)dt * SECPHOUR, 1., 
+          // Assume Canopy albedo is same as snow albedo if snow is present - JJH
+    energy->AlbedoOver = snow->albedo;
+
+	ErrorFlag = snow_intercept((double)dt * SECPHOUR, 1.,
 		       veg_lib[veg_class].LAI[month-1], 
-		       (*Le), longwave, LongUnderOut, 
+		       (*Le), longwave, LongUnderOut,
 		       veg_lib[veg_class].Wdmax[month-1], 
 		       ShortOverIn, *ShortUnderIn, Tcanopy,
-		       BareAlbedo, mu, &energy->canopy_advection, 
+		       BareAlbedo, mu, &energy->canopy_advection,
 		       &energy->AlbedoOver, 
 		       &veg_var_wet->Wdew, &snow->snow_canopy, 
 		       &energy->canopy_latent, 
@@ -349,8 +352,9 @@ double solve_snow(char                 overstory,
         snow->last_snow++;
         snow->albedo = snow_albedo( snowfall[WET], snow->swq, snow->depth,
 				    snow->albedo, snow->coldcontent, (double)dt, 
-				    snow->last_snow, snow->MELTING); 
+				    snow->last_snow, snow->MELTING);
         (*AlbedoUnder) = (*coverage * snow->albedo + (1. - *coverage) * BareAlbedo);
+          
       }
       else {
         // set snow albedo to new snow albedo

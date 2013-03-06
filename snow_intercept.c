@@ -339,7 +339,7 @@ int snow_intercept(double  Dt,
   if ( *IntSnow > 0 || *SnowFall > 0 ) {
     /* Snow present or accumulating in the canopy */
 
-    *AlbedoOver = NEW_SNOW_ALB; // albedo of intercepted snow in canopy
+    //*AlbedoOver = NEW_SNOW_ALB; // albedo of intercepted snow in canopy
     *NetShortOver = (1. - *AlbedoOver) * ShortOverIn; // net SW in canopy
 
     Qnet = solve_canopy_energy_bal(0., band, month, rec, Dt, 
