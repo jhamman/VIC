@@ -110,6 +110,7 @@ veg_lib_struct *read_veglib(FILE *veglib, int *Ntype)
 						      attenuation factor */
       fscanf(veglib, "%lf", &temp[i].trunk_ratio); /* ratio of tree height that
 						      is trunk */
+      fscanf(veglib, "%lf", &temp[i].new_snow_albedo); /* change with Bart's email */
       fgets(str, MAXSTRING, veglib);	/* skip over end of line comments */
       i++;
     }
@@ -139,6 +140,7 @@ veg_lib_struct *read_veglib(FILE *veglib, int *Ntype)
     temp[Nveg_type+i].rad_atten = ref_veg_rad_atten[i];
     temp[Nveg_type+i].wind_atten = ref_veg_wind_atten[i];
     temp[Nveg_type+i].trunk_ratio = ref_veg_trunk_ratio[i];
+    /*  temp[Nveg_type+i].new_snow_albedo = ref_veg_new_snow_albedo[i]; */
   }
 
   return temp;

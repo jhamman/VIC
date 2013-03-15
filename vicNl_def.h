@@ -887,6 +887,7 @@ typedef struct {
   double Wdmax[12];        /* maximum monthly dew holding capacity (mm) */
   double albedo[12];       /* vegetation albedo (added for full energy) 
 			      (fraction) */
+  double new_snow_albedo;  // change with Bart's email
   double displacement[12]; /* vegetation displacement height (m) */
   double emissivity[12];   /* vegetation emissivity (fraction) */
   int    NVegLibTypes;     /* number of vegetation classes defined in library */

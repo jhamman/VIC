@@ -474,9 +474,10 @@ void set_node_parameters(double *, double *, double *, double *, double *, doubl
 			 int, int, char);
 out_data_file_struct *set_output_defaults(out_data_struct *);
 int set_output_var(out_data_file_struct *, int, int, out_data_struct *, char *, int, char *, int, float);
-double snow_albedo(double, double, double, double, double, double, int, char);
+double snow_albedo(double, double, double, double, double, double, double, int, char);
+double snow_albedo_ted(double, double, double, double, double, double, int, char);
 double snow_density(snow_data_struct *, double, double, double, double, double);
-int    snow_intercept(double, double, double, double, double, double,
+int    snow_intercept(double, double, double, double, double, double, double,
                       double, double, double, double, double, double, 
                       double *, double *, double *, double *, double *, 
                       double *, double *, double *, double *, double *, 

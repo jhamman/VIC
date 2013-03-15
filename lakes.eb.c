@@ -716,7 +716,7 @@ void alblake (double  Tcutoff,
 
   // compute snow surface albedo
   if(swq > 0.0)
-    *snowalbedo = snow_albedo(newsnow, swq, depth, *snowalbedo, coldcontent, dt, *last_snow, *MELTING);
+    *snowalbedo = snow_albedo_ted(newsnow, swq, depth, *snowalbedo, coldcontent, dt, *last_snow, *MELTING);
   else if(swq == 0.0 && newsnow > 0.0)
     *snowalbedo = NEW_SNOW_ALB;
   else

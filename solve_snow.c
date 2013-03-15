@@ -139,6 +139,7 @@ double solve_snow(char                 overstory,
   char                FIRST_SOLN[1];
   int                 ErrorFlag;
   float               tempstep;
+  double              new_snow_albedo; // add with Bart's email
   double              ShortOverIn;
   double              melt;
   double              old_coverage;
@@ -254,6 +255,7 @@ double solve_snow(char                 overstory,
 	(*ShortUnderIn) *= (*surf_atten);  // SW transmitted through canopy
 	ShortOverIn      = (1. - (*surf_atten)) * shortwave; // canopy incident SW
 	ErrorFlag = snow_intercept((double)dt * SECPHOUR, 1., 
+                       new_snow_albedo,
 		       veg_lib[veg_class].LAI[month-1], 
 		       (*Le), longwave, LongUnderOut, 
 		       veg_lib[veg_class].Wdmax[month-1], 
@@ -342,12 +344,23 @@ double solve_snow(char                 overstory,
       }
 #endif
 
+      //change with Bart's email start
+      if (iveg != Nveg){
+          new_snow_albedo = veg_lib[veg_class].new_snow_albedo;
+      }
+      else {
+          new_snow_albedo = NEW_SNOW_ALB;
+      }
+      //change with Bart's email end
+
+
       /** compute understory albedo and net shortwave radiation **/
       if ( snow->swq > 0 && store_snowfall == 0 ) {
         // age snow albedo if no new snowfall
         // ignore effects of snow dropping from canopy; only consider fresh snow from sky
         snow->last_snow++;
-        snow->albedo = snow_albedo( snowfall[WET], snow->swq, snow->depth,
+        snow->albedo = snow_albedo( snowfall[WET], new_snow_albedo,
+                                    snow->swq, snow->depth,
 				    snow->albedo, snow->coldcontent, (double)dt, 
 				    snow->last_snow, snow->MELTING); 
         (*AlbedoUnder) = (*coverage * snow->albedo + (1. - *coverage) * BareAlbedo);
@@ -355,7 +368,7 @@ double solve_snow(char                 overstory,
       else {
         // set snow albedo to new snow albedo
         snow->last_snow = 0;
-        snow->albedo = NEW_SNOW_ALB;
+        snow->albedo = new_snow_albedo;
         (*AlbedoUnder) = snow->albedo;
       }
       (*NetShortSnow) = (1.0 - *AlbedoUnder) * (*ShortUnderIn);
