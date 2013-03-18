@@ -92,7 +92,7 @@ int snow_intercept(double  Dt,
 		   double  ShortOverIn,  // incoming SW to overstory
 		   double  ShortUnderIn,  // incoming SW to understory
 		   double  Tcanopy, // canopy air temperature
-		   double  bare_albedo, // albedo of snow-free ground
+		   double  bare_albedo, // albedo of snow-free vegetation tile
 		   double  mu, // fraction of precipitation area
 		   double *AdvectedEnergy,
 		   double *AlbedoOver, // overstory albedo
@@ -348,6 +348,9 @@ int snow_intercept(double  Dt,
       }
       else {
           *AlbedoOver = snow_canopy_albedo(max_vegsnow_albedo,*IntSnow,Dt/SECPHOUR,*last_snow);
+          if ( *AlbedoOver > max_vegsnow_albedo ) {
+              *AlbedoOver = max_vegsnow_albedo;
+          }
       }
     *NetShortOver = (1. - *AlbedoOver) * ShortOverIn; // net SW in canopy
 

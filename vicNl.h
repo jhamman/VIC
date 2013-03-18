@@ -209,7 +209,7 @@ FILE  *check_state_file(char *, dmy_struct *, global_param_struct *, int, int,
                         int *);
 void   close_files(filep_struct *, out_data_file_struct *, filenames_struct *);
 filenames_struct cmd_proc(int argc, char *argv[]);
-void   collect_eb_terms(energy_bal_struct, snow_data_struct, cell_data_struct,
+void   collect_eb_terms(atmos_data_struct *, energy_bal_struct, snow_data_struct, cell_data_struct,
                         int *, int *, int *, int *, int *, double, double, double,
                         int, int, double, int, int, double *, double *,
 #if SPATIAL_FROST
