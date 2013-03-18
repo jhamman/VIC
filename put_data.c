@@ -377,7 +377,8 @@ int  put_data(dist_prcp_struct  *prcp,
 	  /**********************************
 	    Record Energy Balance Terms
 	  **********************************/
-          collect_eb_terms(energy[veg][band],
+          collect_eb_terms(atmos,
+                           energy[veg][band],
                            snow[veg][band],
                            cell[WET][veg][band],
                            &Tsoil_fbcount_total,
@@ -461,7 +462,8 @@ int  put_data(dist_prcp_struct  *prcp,
 	    /**********************************
 	      Record Energy Balance Terms
 	    **********************************/
-            collect_eb_terms(lake_var.energy,
+            collect_eb_terms(atmos,
+                             lake_var.energy,
                              lake_var.snow,
                              lake_var.soil,
                              &Tsoil_fbcount_total,
@@ -978,7 +980,8 @@ void collect_wb_terms(cell_data_struct  cell,
 
 }
 
-void collect_eb_terms(energy_bal_struct energy,
+void collect_eb_terms(atmos_data_struct *atmos,
+                      energy_bal_struct energy,
                       snow_data_struct  snow,
                       cell_data_struct  cell_wet,
                       int              *Tsoil_fbcount_total,
@@ -1121,10 +1124,7 @@ void collect_eb_terms(energy_bal_struct energy,
     out_data[OUT_IN_LONG].data[0] += energy.LongUnderIn * AreaFactor;
 
   /** record albedo **/
-  if ( snow.snow && overstory )
-    out_data[OUT_ALBEDO].data[0]    += energy.AlbedoOver * AreaFactor;
-  else
-    out_data[OUT_ALBEDO].data[0]    += energy.AlbedoUnder * AreaFactor;
+    out_data[OUT_ALBEDO].data[0]    += ( 1 - energy.AlbedoOver/atmos->shortwave[NR] ) * AreaFactor;
 
   /** record latent heat flux **/
   out_data[OUT_LATENT].data[0]    -= energy.AtmosLatent * AreaFactor;
