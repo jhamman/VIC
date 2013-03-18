@@ -130,6 +130,9 @@ double solve_snow(char                 overstory,
   2012-Feb-08 Renamed depth_full_snow_cover to max_snow_distrib_slope
 	      and clarified the descriptions of the SPATIAL_SNOW
 	      option.							TJB
+  2013-March-17 Implemented vegetation dependent maximum snow albedo.  
+          Also set initilization of AlbedoUnder=BARE_SOIL_ALBEDO and
+          energy->AlbedoOver=BareAlbedo                          JJH
 *********************************************************************/
 
   extern option_struct   options;
@@ -139,7 +142,7 @@ double solve_snow(char                 overstory,
   char                FIRST_SOLN[1];
   int                 ErrorFlag;
   float               tempstep;
-  double              new_snow_albedo; // add with Bart's email
+  double              max_vegsnow_albedo;
   double              ShortOverIn;
   double              melt;
   double              old_coverage;
@@ -255,7 +258,7 @@ double solve_snow(char                 overstory,
 	(*ShortUnderIn) *= (*surf_atten);  // SW transmitted through canopy
 	ShortOverIn      = (1. - (*surf_atten)) * shortwave; // canopy incident SW
 	ErrorFlag = snow_intercept((double)dt * SECPHOUR, 1., 
-                       new_snow_albedo,
+                       max_vegsnow_albedo,
 		       veg_lib[veg_class].LAI[month-1], 
 		       (*Le), longwave, LongUnderOut, 
 		       veg_lib[veg_class].Wdmax[month-1], 
@@ -272,7 +275,7 @@ double solve_snow(char                 overstory,
 		       &energy->Tfoliage, &energy->Tfoliage_fbflag, 
                        &energy->Tfoliage_fbcount, &snow->tmp_int_storage, 
 		       &snow->canopy_vapor_flux, wind, displacement, 
-		       ref_height, roughness, root, *UnderStory, band, 
+		       ref_height, roughness, root,&snow->last_snow, *UnderStory, band,
 		       hour, iveg, month, rec, hidx, veg_class, atmos, 
 		       layer_dry, layer_wet, soil_con, veg_var_dry, veg_var_wet);
         if ( ErrorFlag == ERROR ) return ( ERROR );
@@ -344,31 +347,28 @@ double solve_snow(char                 overstory,
       }
 #endif
 
-      //change with Bart's email start
       if (iveg != Nveg){
-          new_snow_albedo = veg_lib[veg_class].new_snow_albedo;
+          max_vegsnow_albedo = veg_lib[veg_class].max_vegsnow_albedo;
       }
       else {
-          new_snow_albedo = NEW_SNOW_ALB;
+          max_vegsnow_albedo = NEW_SNOW_ALB;
       }
-      //change with Bart's email end
-
 
       /** compute understory albedo and net shortwave radiation **/
       if ( snow->swq > 0 && store_snowfall == 0 ) {
         // age snow albedo if no new snowfall
         // ignore effects of snow dropping from canopy; only consider fresh snow from sky
         snow->last_snow++;
-        snow->albedo = snow_albedo( snowfall[WET], new_snow_albedo,
+        snow->albedo = snow_albedo( snowfall[WET], NEW_SNOW_ALB,
                                     snow->swq, snow->depth,
-				    snow->albedo, snow->coldcontent, (double)dt, 
+				    snow->albedo, snow->coldcontent, (double)dt,
 				    snow->last_snow, snow->MELTING); 
         (*AlbedoUnder) = (*coverage * snow->albedo + (1. - *coverage) * BareAlbedo);
       }
       else {
         // set snow albedo to new snow albedo
         snow->last_snow = 0;
-        snow->albedo = new_snow_albedo;
+        snow->albedo = NEW_SNOW_ALB;
         (*AlbedoUnder) = snow->albedo;
       }
       (*NetShortSnow) = (1.0 - *AlbedoUnder) * (*ShortUnderIn);
@@ -530,8 +530,8 @@ double solve_snow(char                 overstory,
       /** Ground Snow not Present, and Falling Snow Does not Reach Ground **/
 
       ppt[WET] += rainfall[WET];
-      energy->AlbedoOver      = 0.;
-      (*AlbedoUnder)          = BareAlbedo;
+      energy->AlbedoOver      = BareAlbedo;
+      (*AlbedoUnder)          = BARE_SOIL_ALBEDO;
       (*NetLongSnow)          = 0.;
       (*NetShortSnow)         = 0.;
       (*NetShortGrnd)         = 0.;
@@ -559,8 +559,8 @@ double solve_snow(char                 overstory,
     energy->Tfoliage        = air_temp;
 
     /** Compute Radiation Balance for Bare Surface **/ 
-    energy->AlbedoOver   = 0.;
-    (*AlbedoUnder)       = BareAlbedo;
+    energy->AlbedoOver   = BareAlbedo;
+    (*AlbedoUnder)       = BARE_SOIL_ALBEDO;
     energy->NetLongOver  = 0.;
     energy->LongOverIn   = 0.;
     energy->NetShortOver = 0.;

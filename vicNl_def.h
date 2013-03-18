@@ -126,6 +126,7 @@
 	      and clarified the descriptions of the SPATIAL_SNOW
 	      option.							TJB
   2012-Mar-30 Created constant DEFAULT_WIND_SPEED.			TJB
+  2013-Mar-17 Added vegetation dependent maximum snow albedo     JJH
 *********************************************************************/
 
 #include <user_def.h>
@@ -887,7 +888,7 @@ typedef struct {
   double Wdmax[12];        /* maximum monthly dew holding capacity (mm) */
   double albedo[12];       /* vegetation albedo (added for full energy) 
 			      (fraction) */
-  double new_snow_albedo;  // change with Bart's email
+  double max_vegsnow_albedo;  /* maximum snow covered canopy albedo */
   double displacement[12]; /* vegetation displacement height (m) */
   double emissivity[12];   /* vegetation emissivity (fraction) */
   int    NVegLibTypes;     /* number of vegetation classes defined in library */

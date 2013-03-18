@@ -77,10 +77,13 @@ static char vcid[] = "$Id$";
   2009-Dec-11 Replaced "assert" statements with "if" statements.	TJB
   2010-Apr-26 Replaced individual forcing variables with atmos_data
 	      in argument list.						TJB
+  2013-Mar-17 Added vegetation dependent maximum snow albedo - 
+          max_vegsnow_albedo.  This is value is also allowed to decay using
+          the USACE albedo decay function snow_canopy_albedo().     JJH
 *****************************************************************************/
 int snow_intercept(double  Dt,
 		   double  F,  
-                   double  new_snow_albedo, // change with Bart's email
+           double  max_vegsnow_albedo, // maxiumum snow covered canopy albedo
 		   double  LAI, 
 		   double  Le, 
 		   double  LongOverIn, // incominf LW from sky
@@ -115,7 +118,8 @@ int snow_intercept(double  Dt,
 		   double *displacement,
 		   double *ref_height,
 		   double *roughness,
-		   float  *root, 
+		   float  *root,
+           int    *last_snow,
 		   int     UnderStory,
 		   int     band, 
 		   int     hour, 
@@ -247,7 +251,7 @@ int snow_intercept(double  Dt,
      Ringyo Shikenjo Tokyo, #54, 1952.                                
      Bulletin of the Govt. Forest Exp. Station,                       
      Govt. Forest Exp. Station, Meguro, Tokyo, Japan.                 
-     FORSTX 634.9072 R475r #54.                                       
+     FORSTX 634.9072 R475r #54.
      Page 146, Figure 10.                                               
      
      Reduce the amount of intercepted snow if snowing, windy, and     
@@ -339,8 +343,12 @@ int snow_intercept(double  Dt,
 
   if ( *IntSnow > 0 || *SnowFall > 0 ) {
     /* Snow present or accumulating in the canopy */
-
-    *AlbedoOver = new_snow_albedo; /*change with bart's email NEW_SNOW_ALB; */  // albedo of intercepted snow in canopy
+      if ( *SnowFall > 0 || *last_snow == 0) {
+          *AlbedoOver = max_vegsnow_albedo;
+      }
+      else {
+          *AlbedoOver = snow_canopy_albedo(max_vegsnow_albedo,*IntSnow,Dt/SECPHOUR,*last_snow);
+      }
     *NetShortOver = (1. - *AlbedoOver) * ShortOverIn; // net SW in canopy
 
     Qnet = solve_canopy_energy_bal(0., band, month, rec, Dt, 
