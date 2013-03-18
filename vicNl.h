@@ -105,6 +105,8 @@
   2012-Jan-16 Removed LINK_DEBUG code					BN
   2012-Oct-25 Changed calc_energy_balance_error to return the error to
 	      the parent function.					CL via TJB
+  2013-Mar-17 Added snow_canopy_albedo() and added argument to 
+          snow_intercept()                       JJH
 ************************************************************************/
 
 #include <math.h>
@@ -474,15 +476,16 @@ void set_node_parameters(double *, double *, double *, double *, double *, doubl
 			 int, int, char);
 out_data_file_struct *set_output_defaults(out_data_struct *);
 int set_output_var(out_data_file_struct *, int, int, out_data_struct *, char *, int, char *, int, float);
-double snow_albedo(double, double, double, double, double, double, int, char);
+double snow_albedo(double, double, double, double, double, double, double, int, char);
+double snow_canopy_albedo(double, double, double, int);
 double snow_density(snow_data_struct *, double, double, double, double, double);
-int    snow_intercept(double, double, double, double, double, double,
+int    snow_intercept(double, double, double, double, double, double, double,
                       double, double, double, double, double, double, 
                       double *, double *, double *, double *, double *, 
                       double *, double *, double *, double *, double *, 
                       double *, double *, double *, double *, double *, 
                       double *, char *, int *, double *, double *, double *, 
-                      double *, double *, double *, float *,
+                      double *, double *, double *, float *,int *,
                       int, int, int, int, int, int, int, int,
                       atmos_data_struct *, layer_data_struct *, 
                       layer_data_struct *, soil_con_struct *, 

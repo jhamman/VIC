@@ -230,6 +230,7 @@ double new_snow_density(double air_temp) {
 
 
 double snow_albedo(double new_snow,
+                   double max_vegsnow_albedo,
                    double swq,
                    double depth,
                    double albedo,
@@ -260,7 +261,7 @@ double snow_albedo(double new_snow,
   extern option_struct   options;
 
   /** New Snow **/
-  if(new_snow > TraceSnow  && cold_content < 0.0 ) albedo = NEW_SNOW_ALB;
+  if(new_snow > TraceSnow  && cold_content < 0.0 ) albedo = max_vegsnow_albedo;
 
   /** Aged Snow **/
   else if(swq > 0.0) {
@@ -287,13 +288,13 @@ double snow_albedo(double new_snow,
 
       /* Accumulation season */
       if ( cold_content < 0.0 && !MELTING )
-        albedo = NEW_SNOW_ALB*pow(SNOW_ALB_ACCUM_A, 
+        albedo = max_vegsnow_albedo*pow(SNOW_ALB_ACCUM_A, 
 				  pow((double)last_snow * dt / 24.,
 				      SNOW_ALB_ACCUM_B));
 
       /* Melt Season */
       else
-        albedo = NEW_SNOW_ALB*pow(SNOW_ALB_THAW_A, 
+        albedo = max_vegsnow_albedo*pow(SNOW_ALB_THAW_A, 
 				  pow((double)last_snow * dt / 24.,
 				      SNOW_ALB_THAW_B));
 
@@ -308,3 +309,36 @@ double snow_albedo(double new_snow,
   return(albedo);
 
 }
+
+double snow_canopy_albedo(double max_vegsnow_albedo,
+                          double IntSnow,
+                          double dt,
+                          int    last_snow) {
+/**********************************************************************
+snow_canopy_albedo		Joe Hamman		March 17, 2013
+ 
+This subroutine computes the canopy albedo when intercepted snow is
+present.  The routine is based on the algorithm of the US Army Corps
+of Engineers but only uses the accumulation season constants.  
+**********************************************************************/
+    double albedo;
+    
+    /** Age Snow **/
+    if( IntSnow >0 && last_snow == 0) {
+        albedo = max_vegsnow_albedo;
+    }
+    else { 
+        if(IntSnow > 0.0) {
+            albedo = max_vegsnow_albedo*pow(SNOW_ALB_ACCUM_A,
+                                            pow((double)last_snow * dt / 24.,
+                                                SNOW_ALB_ACCUM_B));
+        }
+        else {
+            /* No snow falling or present */
+            albedo = 0;
+        }
+    }
+    return(albedo);
+    
+}
+

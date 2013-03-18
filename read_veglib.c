@@ -22,6 +22,9 @@ veg_lib_struct *read_veglib(FILE *veglib, int *Ntype)
   2009-Oct-01 Added error message for case of LAI==0 and overstory==1.	TJB
   2010-Apr-28 Replaced GLOBAL_LAI with VEGPARAM_LAI and LAI_SRC.	TJB
   2012-Jan-16 Removed LINK_DEBUG code					BN
+  2013-Mar-17 Added max_vegsnow_albedo column based on Barlage et 
+          al.(2005).  This change limits the increase in canopy albedo
+          to a vegetation dependent value.              JJH
 **********************************************************************/
 {
   extern option_struct options;
@@ -110,6 +113,7 @@ veg_lib_struct *read_veglib(FILE *veglib, int *Ntype)
 						      attenuation factor */
       fscanf(veglib, "%lf", &temp[i].trunk_ratio); /* ratio of tree height that
 						      is trunk */
+      fscanf(veglib, "%lf", &temp[i].max_vegsnow_albedo); 
       fgets(str, MAXSTRING, veglib);	/* skip over end of line comments */
       i++;
     }
@@ -139,6 +143,7 @@ veg_lib_struct *read_veglib(FILE *veglib, int *Ntype)
     temp[Nveg_type+i].rad_atten = ref_veg_rad_atten[i];
     temp[Nveg_type+i].wind_atten = ref_veg_wind_atten[i];
     temp[Nveg_type+i].trunk_ratio = ref_veg_trunk_ratio[i];
+    /*  temp[Nveg_type+i].max_vegsnow_albedo = ref_veg_max_vegsnow_albedo[i]; */
   }
 
   return temp;
