@@ -1124,7 +1124,7 @@ void collect_eb_terms(atmos_data_struct *atmos,
     out_data[OUT_IN_LONG].data[0] += energy.LongUnderIn * AreaFactor;
 
   /** record albedo **/
-    out_data[OUT_ALBEDO].data[0]    += ( 1 - energy.AlbedoOver/atmos->shortwave[NR] ) * AreaFactor;
+    out_data[OUT_ALBEDO].data[0]    += ( 1 - energy.NetShortAtmos/atmos->shortwave[NR] ) * AreaFactor;
 
   /** record latent heat flux **/
   out_data[OUT_LATENT].data[0]    -= energy.AtmosLatent * AreaFactor;
@@ -1228,10 +1228,7 @@ void collect_eb_terms(atmos_data_struct *atmos,
   out_data[OUT_NET_LONG_BAND].data[band] += energy.NetLongAtmos * Cv * lakefactor;
 
   /** record band albedo **/
-  if (snow.snow && overstory)
-    out_data[OUT_ALBEDO_BAND].data[band] += energy.AlbedoOver * Cv * lakefactor;
-  else
-    out_data[OUT_ALBEDO_BAND].data[band] += energy.AlbedoUnder * Cv * lakefactor;
+  out_data[OUT_ALBEDO_BAND].data[band] += ( 1 - energy.NetShortAtmos/atmos->shortwave[NR] ) * Cv * lakefactor;
 
   /** record band net latent heat flux **/
   out_data[OUT_LATENT_BAND].data[band] -= energy.latent * Cv * lakefactor;

@@ -362,7 +362,10 @@ double solve_snow(char                 overstory,
         snow->albedo = snow_albedo( snowfall[WET], NEW_SNOW_ALB,
                                     snow->swq, snow->depth,
 				    snow->albedo, snow->coldcontent, (double)dt,
-				    snow->last_snow, snow->MELTING); 
+				    snow->last_snow, snow->MELTING);
+          if ( snow->albedo < BareAlbedo ) {
+              snow->albedo = BareAlbedo;
+          }
         (*AlbedoUnder) = (*coverage * snow->albedo + (1. - *coverage) * BareAlbedo);
       }
       else {
@@ -531,7 +534,7 @@ double solve_snow(char                 overstory,
 
       ppt[WET] += rainfall[WET];
       energy->AlbedoOver      = BareAlbedo;
-      (*AlbedoUnder)          = BARE_SOIL_ALBEDO;
+      (*AlbedoUnder)          = BareAlbedo;
       (*NetLongSnow)          = 0.;
       (*NetShortSnow)         = 0.;
       (*NetShortGrnd)         = 0.;
@@ -560,7 +563,7 @@ double solve_snow(char                 overstory,
 
     /** Compute Radiation Balance for Bare Surface **/ 
     energy->AlbedoOver   = BareAlbedo;
-    (*AlbedoUnder)       = BARE_SOIL_ALBEDO;
+    (*AlbedoUnder)       = BareAlbedo;
     energy->NetLongOver  = 0.;
     energy->LongOverIn   = 0.;
     energy->NetShortOver = 0.;
