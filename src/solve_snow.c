@@ -362,7 +362,10 @@ double solve_snow(char                 overstory,
         snow->albedo = snow_albedo( snowfall[WET], NEW_SNOW_ALB,
                                     snow->swq, snow->depth,
 				    snow->albedo, snow->coldcontent, (double)dt,
-				    snow->last_snow, snow->MELTING); 
+				    snow->last_snow, snow->MELTING);
+          if ( snow->albedo < BareAlbedo ) {
+              snow->albedo = BareAlbedo;
+          }
         (*AlbedoUnder) = (*coverage * snow->albedo + (1. - *coverage) * BareAlbedo);
       }
       else {
