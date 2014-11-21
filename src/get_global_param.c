@@ -295,6 +295,11 @@ global_param_struct get_global_param(filenames_struct *names,
         if(strcasecmp("TRUE",flgstr)==0) options.BLOWING=TRUE;
         else options.BLOWING = FALSE;
       }
+      else if(strcasecmp("NEW_RUNOFF",optstr)==0) {
+        sscanf(cmdstr,"%*s %s",flgstr);
+        if(strcasecmp("TRUE",flgstr)==0) options.NEW_RUNOFF=TRUE;
+        else options.NEW_RUNOFF = FALSE;
+      }
       else if(strcasecmp("CORRPREC",optstr)==0) {
         sscanf(cmdstr,"%*s %s",flgstr);
         if(strcasecmp("TRUE",flgstr)==0) options.CORRPREC=TRUE;

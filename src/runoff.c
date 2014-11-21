@@ -554,8 +554,13 @@ void compute_runoff_and_asat(soil_con_struct *soil_con, double *moist, double in
   *A        = 1.0 - pow((1.0 - top_moist / top_max_moist),ex);
 
   max_infil = (1.0+soil_con->b_infilt) * top_max_moist;
-  i_0      = max_infil * (1.0 - pow((1.0 - *A),(1.0 / soil_con->b_infilt)));
-
+  if (options.NEW_RUNOFF) {
+    ex = (1 / (soil_con->b_infilt + 1));
+    i_0 = max_infil * pow(1.0 + top_moist * (soil_con->b_infilt + 1) / max_infil, ex);
+  }
+  else {
+    i_0      = max_infil * (1.0 - pow((1.0 - *A),(1.0 / soil_con->b_infilt)));
+  }
   /** equation (3a) Wood et al. **/
 
   if (inflow == 0.0) *runoff = 0.0;
@@ -564,6 +569,11 @@ void compute_runoff_and_asat(soil_con_struct *soil_con, double *moist, double in
     *runoff = inflow - top_max_moist + top_moist;
 
   /** equation (3b) Wood et al. (wrong in paper) **/
+  else if (options.NEW_RUNOFF) {
+    ex = 1.0+soil_con->b_infilt;
+    *runoff = inflow + top_moist * (pow(1 - (i_0 + inflow) / max_infil, ex)
+                                    - pow(1 - i_0 / max_infil, ex));
+  }
   else {
     basis = 1.0 - (i_0 + inflow) / max_infil;
     *runoff = (inflow - top_max_moist + top_moist

@@ -143,6 +143,7 @@ void initialize_global() {
   // simulation modes
   options.AboveTreelineVeg      = -1;
   options.AERO_RESIST_CANSNOW   = AR_406_FULL;
+  options.NEW_RUNOFF            = FALSE;
   options.BLOWING               = FALSE;
   options.CARBON                = FALSE;
   options.CLOSE_ENERGY          = FALSE;

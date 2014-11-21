@@ -864,6 +864,7 @@ typedef struct {
 				   output files are used (for backwards-compatibility); if outfiles and
 				   variables are explicitly mentioned in global parameter file, this option
 				   is ignored. */
+  int    NEW_RUNOFF;     /* TRUE uses corrected runoff derivation for the VIC curve*/
 } option_struct;
 
 /*******************************************************
