@@ -4,7 +4,7 @@
 
 // global variables
 
-char *version = "5.0 beta 2014-Sep-29";
+char *version = "5.0 beta 2014-Nov-22";
 
 int   flag;
 int   NR;       /* array index for atmos struct that indicates
@@ -133,25 +133,15 @@ main(int   argc,
 {
     /** Variable Declarations **/
 
-    char                  NEWCELL;
-    char                  LASTREC;
     char                  MODEL_DONE;
     char                  RUN_MODEL;
     char                  ErrStr[MAXSTRING];
     char                  write_flag;
-    int                   rec, i, j;
-    int                   veg;
-    int                   band;
+    int                   rec;
     int                   Nveg_type;
     int                   cellnum;
-    int                   index;
-    int                   Ncells;
     int                   startrec;
     int                   ErrorFlag;
-    double                storage;
-    double                veg_fract;
-    double                band_fract;
-    double                Clake;
     dmy_struct           *dmy;
     atmos_data_struct    *atmos;
     veg_hist_struct     **veg_hist;
@@ -225,7 +215,6 @@ main(int   argc,
         soil_con = read_soilparam(filep.soilparam, &RUN_MODEL, &MODEL_DONE);
 
         if (RUN_MODEL) {
-            NEWCELL = TRUE;
             cellnum++;
 
             if (!options.OUTPUT_FORCE) {
@@ -314,12 +303,6 @@ main(int   argc,
                 ******************************************/
 
                 for (rec = startrec; rec < global_param.nrecs; rec++) {
-                    if (rec == global_param.nrecs - 1) {
-                        LASTREC = TRUE;
-                    }
-                    else {
-                        LASTREC = FALSE;
-                    }
 
                     /**************************************************
                        Compute cell physics for 1 timestep
@@ -375,7 +358,6 @@ main(int   argc,
                         }
                     }
 
-                    NEWCELL = FALSE;
                 } /* End Rec Loop */
             } /* !OUTPUT_FORCE */
 

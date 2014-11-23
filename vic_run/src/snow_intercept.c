@@ -138,15 +138,8 @@ snow_intercept(double             Dt,
                                     result of snowmelt (m) */
     double               ExcessSnowMelt; /* Snowmelt in excess of the water holding
                                             capacity of the tree (m) */
-    double               EsSnow; /* saturated vapor pressure in the snow pack
-                                    (Pa)  */
     double               InitialSnowInt; /* Initial intercepted snow (m) */
-    double               InitialWaterInt; /* Initial intercepted water (snow and rain)
-                                             (m) */
     double               IntRainOrg;
-    double               Ls;     /* Latent heat of sublimation (J/(kg K) */
-    double               MassBalanceError; /* Mass blalnce to make sure no water is
-                                              being destroyed/created (m) */
     double               MaxWaterInt; /* Water interception capacity (m) */
     double               MaxSnowInt; /* Snow interception capacity (m) */
     double               NetRadiation;
@@ -159,8 +152,6 @@ snow_intercept(double             Dt,
     /* double SensibleHeat; */           /* Sensible heat flux (W/m2) */
     double               SnowThroughFall; /* Amount of snow reaching to the ground (m)
                                            */
-    double               Tmp;    /* Temporary variable */
-
     double               Imax1;  /* maxium water intecept regardless of temp */
     double               IntRainFract; /* Fraction of intercpeted water which is
                                           liquid */
@@ -202,9 +193,6 @@ snow_intercept(double             Dt,
     IntRainOrg = *IntRain;
 
     /* Initialize Drip, H2O balance, and mass release variables. */
-
-    InitialWaterInt = *IntSnow + *IntRain;
-
     *IntSnow /= F;
     *IntRain /= F;
 
@@ -402,15 +390,13 @@ snow_intercept(double             Dt,
 
     if (Tupper != MISSING && Tlower != MISSING) {
         *Tfoliage = root_brent(Tlower, Tupper, ErrorString,
-                               func_canopy_energy_bal, band,
-                               month, rec, Dt, soil_con->elevation,
-                               soil_con->max_moist,
+                               func_canopy_energy_bal, month, Dt,
+                               soil_con->elevation, soil_con->max_moist,
                                soil_con->Wcr, soil_con->Wpwp, soil_con->depth,
                                soil_con->frost_fract,
                                AirDens, EactAir, Press, Le,
                                Tcanopy, Vpd, shortwave, Catm, dryFrac,
-                               &Evap, Ra, Ra_used,
-                               *RainFall, Wind, UnderStory, iveg,
+                               &Evap, Ra, Ra_used, *RainFall, Wind,
                                veg_class, displacement, ref_height,
                                roughness, root, CanopLayerBnd, IntRainOrg,
                                *IntSnow,
@@ -622,13 +608,6 @@ snow_intercept(double             Dt,
     }
 
     /* Calculate intercepted H2O balance. */
-
-    MassBalanceError = (InitialWaterInt - (*IntSnow + *IntRain)) +
-                       (*SnowFall + *RainFall) - (SnowThroughFall +
-                                                  RainThroughFall + Drip +
-                                                  ReleasedMass) +
-                       *VaporMassFlux;
-
     *RainFall = RainThroughFall + Drip;
     *SnowFall = SnowThroughFall + ReleasedMass;
 

@@ -68,17 +68,12 @@ calc_atmos_energy_bal(double  InOverSensible,
 
     extern option_struct options;
 
-    double               AtmosLatent;
     double               F; // canopy closure fraction, not currently used by VIC
-    double               InLatent;
     double               InSensible;
     double               NetRadiation;
     double               T_lower;
     double               T_upper;
     double               Tcanopy;
-    double               VP_lower;
-    double               VP_upper;
-    double               gamma;
     char                 ErrorString[MAXSTRING];
 
     F = 1;
@@ -99,8 +94,6 @@ calc_atmos_energy_bal(double  InOverSensible,
 
     (*LatentHeatSub) = (LatentHeatSubOver + LatentHeatSubUnder);
 
-    InLatent = (*LatentHeat) + (*LatentHeatSub);
-
     /******************************
        Find Canopy Air Temperature
     ******************************/
@@ -115,10 +108,8 @@ calc_atmos_energy_bal(double  InOverSensible,
 
         // iterate for canopy air temperature
         Tcanopy = root_brent(T_lower, T_upper, ErrorString,
-                             func_atmos_energy_bal,
-                             (*LatentHeat) + (*LatentHeatSub),
-                             NetRadiation, Ra, Tair, atmos_density, InSensible,
-                             SensibleHeat);
+                             func_atmos_energy_bal, Ra, Tair, atmos_density,
+                             InSensible, SensibleHeat);
 
         if (Tcanopy <= -998) {
             if (options.TFALLBACK) {
