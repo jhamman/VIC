@@ -216,28 +216,39 @@ vic_force(atmos_data_struct *atmos,
         }
     }
 
-    /* Next, overwrite with timeseries */
+    /* Next, overwrite with veg_hist values, validate, and average */
     for (rec = 0; rec < global_param.nrecs; rec++) {
         for (v = 0; v < veg_con[0].vegetat_type_num; v++) {
             for (i = 0; i < NF; i++) {
                 uidx = rec * NF + i;
-                if (param_set.TYPE[ALBEDO].SUPPLIED) {
+                if (param_set.TYPE[ALBEDO].SUPPLIED &&
+                    options.ALB_SRC == FROM_VEGHIST) {
                     if (veg_hist_data[ALBEDO][v][uidx] != NODATA_VH) {
                         veg_hist[rec][v].albedo[i] =
                             veg_hist_data[ALBEDO][v][uidx];
                     }
                 }
-                if (param_set.TYPE[LAI_IN].SUPPLIED) {
+                if (param_set.TYPE[LAI_IN].SUPPLIED &&
+                    options.LAI_SRC == FROM_VEGHIST) {
                     if (veg_hist_data[LAI_IN][v][uidx] != NODATA_VH) {
                         veg_hist[rec][v].LAI[i] =
                             veg_hist_data[LAI_IN][v][uidx];
                     }
                 }
-                if (param_set.TYPE[VEGCOVER].SUPPLIED) {
+                if (param_set.TYPE[VEGCOVER].SUPPLIED &&
+                    options.VEGCOVER_SRC == FROM_VEGHIST) {
                     if (veg_hist_data[VEGCOVER][v][uidx] != NODATA_VH) {
                         veg_hist[rec][v].vegcover[i] =
                             veg_hist_data[VEGCOVER][v][uidx];
                     }
+                }
+                // Check on vegcover
+                if (veg_hist[rec][v].vegcover[i] < MIN_VEGCOVER) {
+                    log_warn(
+                        "rec %zu, veg %zu substep %zu vegcover %f < minimum of %f; setting = %f\n", rec, v, i,
+                        veg_hist[rec][v].vegcover[i], MIN_VEGCOVER,
+                        MIN_VEGCOVER);
+                    veg_hist[rec][v].vegcover[i] = MIN_VEGCOVER;
                 }
             }
             if (NF > 1) {

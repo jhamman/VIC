@@ -41,6 +41,7 @@ double calc_netshort(double, int, double, double *);
 void check_files(filep_struct *, filenames_struct *);
 FILE  *check_state_file(char *, size_t, size_t, int *);
 void close_files(filep_struct *, out_data_file_struct *, filenames_struct *);
+size_t count_outfile_nvars(FILE *gp);
 out_data_struct *create_output_list();
 void free_atmos(int nrecs, atmos_data_struct **atmos);
 void free_veg_hist(int nrecs, int nveg, veg_hist_struct ***veg_hist);
@@ -60,7 +61,7 @@ void print_atmos_data(atmos_data_struct *atmos, size_t nr);
 void parse_output_info(FILE *, out_data_file_struct **, out_data_struct *);
 void read_atmos_data(FILE *, global_param_struct, int, int, double **,
                      double ***);
-double **read_forcing_data(FILE * *, global_param_struct, double ****);
+double **read_forcing_data(FILE **, global_param_struct, double ****);
 void read_initial_model_state(FILE *, all_vars_struct *, int, int, int,
                               soil_con_struct *);
 lake_con_struct read_lakeparam(FILE *, soil_con_struct, veg_con_struct *);

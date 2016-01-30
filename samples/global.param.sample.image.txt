@@ -7,12 +7,12 @@
 #######################################################################
 NLAYER		3	# number of soil layers
 NODES		10	# number of soil thermal nodes
-MODEL_STEPS_PER_DAY 	3	# model time step in hours (set to 1 if FULL_ENERGY = FALSE, set to > 1 if FULL_ENERGY = TRUE)
-SNOW_STEPS_PER_DAY	3	# time step in hours for which to solve the snow model (should = MODEL_STEPS_PER_DAY if MODEL_STEPS_PER_DAY < 24)
+MODEL_STEPS_PER_DAY 	8	# number of model time steps per day (set to 1 if FULL_ENERGY = FALSE, set to > 1 if FULL_ENERGY = TRUE)
+SNOW_STEPS_PER_DAY	8	# number of time steps per day for which to solve the snow model (should = MODEL_STEPS_PER_DAY if MODEL_STEPS_PER_DAY > 1)
+RUNOFF_STEPS_PER_DAY	24	# time step in hours for which to solve the runoff model (should be >= MODEL_STEPS_PER_DAY)
 STARTYEAR	2000	# year model simulation starts
 STARTMONTH	01	# month model simulation starts
 STARTDAY	01 	# day model simulation starts
-STARTHOUR	00	# hour model simulation starts
 ENDYEAR 	2000	# year model simulation ends
 ENDMONTH	12	# month model simulation ends
 ENDDAY		31	# day model simulation ends
@@ -131,10 +131,8 @@ FORCE_STEPS_PER_DAY	24	# Forcing time step length (hours)
 FORCEYEAR	2000	# Year of first forcing record
 FORCEMONTH	01	# Month of first forcing record
 FORCEDAY	01	# Day of first forcing record
-FORCEHOUR	00	# Hour of first forcing record
 GRID_DECIMAL	4	# Number of digits after decimal point in forcing file names
 WIND_H          10.0    # height of wind speed measurement (m)
-MEASURE_H       2.0     # height of humidity measurement (m)
 
 #######################################################################
 # Land Surface Files and Parameters
@@ -143,16 +141,11 @@ SOIL            (put the soil parameter path/file here)	# Soil parameter path/fi
 BASEFLOW	ARNO	# ARNO = columns 5-8 are the standard VIC baseflow parameters; NIJSSEN2001 = columns 5-8 of soil file are baseflow parameters from Nijssen et al (2001)
 JULY_TAVG_SUPPLIED	FALSE	# TRUE = final column of the soil parameter file will contain average July air temperature, for computing treeline; this will be ignored if COMPUTE_TREELINE is FALSE; FALSE = compute the treeline based on the average July air temperature of the forcings over the simulation period
 ORGANIC_FRACT	FALSE	# TRUE = simulate organic soils; soil param file contains 3*Nlayer extra columns, listing for each layer the organic fraction, and the bulk density and soil particle density of the organic matter in the soil layer; FALSE = soil param file does not contain any information about organic soil, and organic fraction should be assumed to be 0
-VEGLIB	        (put the veg library path/file here)	# Veg library path/file
 VEGPARAM        (put the veg parameter path/file here)	# Veg parameter path/file
 ROOT_ZONES      3	# Number of root zones (must match format of veg param file)
-#VEGLIB_VEGCOVER	FALSE	# TRUE = veg lib file contains 12 monthly values of partial vegcover fraction for each veg class, between the LAI and albedo values
-#VEGPARAM_LAI 	TRUE    # TRUE = veg param file contains LAI information; FALSE = veg param file does NOT contain LAI information
-#VEGPARAM_ALB 	FALSE    # TRUE = veg param file contains albedo information; FALSE = veg param file does NOT contain albedo information
-#VEGPARAM_VEGCOVER 	FALSE    # TRUE = veg param file contains veg_cover information; FALSE = veg param file does NOT contain veg_cover information
-#LAI_SRC 	FROM_VEGLIB    # FROM_VEGPARAM = read LAI from veg param file; FROM_VEGLIB = read LAI from veg library file
-#ALB_SRC 	FROM_VEGLIB    # FROM_VEGPARAM = read albedo from veg param file; FROM_VEGLIB = read albedo from veg library file
-#VEGCOVER_SRC 	FROM_VEGLIB    # FROM_VEGPARAM = read veg_cover from veg param file; FROM_VEGLIB = read veg_cover from veg library file
+#LAI_SRC 	FROM_VEGPARAM    # FROM_VEGPARAM = read LAI from veg param file; FROM_VEGHIST = read LAI from veg_hist forcing file
+#ALB_SRC 	FROM_VEGPARAM    # FROM_VEGPARAM = read ALBEDO from veg param file; FROM_VEGHIST = read ALBEDO from veg_hist forcing file
+#VEGCOVER_SRC 	FROM_DEFAULT     # FROM_DEFAULT = set all vegcover values to 1.0; FROM_VEGPARAM = read VEGCOVER from veg param file; FROM_VEGHIST = read VEGCOVER from veg_hist forcing file
 SNOW_BAND	1	# Number of snow bands; if number of snow bands > 1, you must insert the snow band path/file after the number of bands (e.g. SNOW_BAND 5 my_path/my_snow_band_file)
 
 #######################################################################
@@ -204,12 +197,12 @@ PRT_SNOW_BAND   FALSE   # TRUE = write a "snowband" output file, containing band
 #
 #   N_OUTFILES    <n_outfiles>
 #
-#   OUTFILE       <prefix>        <nvars>
+#   OUTFILE       <prefix>
 #   OUTVAR        <varname>       [<format>        <type>  <multiplier>]
 #   OUTVAR        <varname>       [<format>        <type>  <multiplier>]
 #   OUTVAR        <varname>       [<format>        <type>  <multiplier>]
 #
-#   OUTFILE       <prefix>        <nvars>
+#   OUTFILE       <prefix>
 #   OUTVAR        <varname>       [<format>        <type>  <multiplier>]
 #   OUTVAR        <varname>       [<format>        <type>  <multiplier>]
 #   OUTVAR        <varname>       [<format>        <type>  <multiplier>]
@@ -219,9 +212,8 @@ PRT_SNOW_BAND   FALSE   # TRUE = write a "snowband" output file, containing band
 #   <n_outfiles> = number of output files
 #   <prefix>     = name of the output file, NOT including latitude
 #                  and longitude
-#   <nvars>      = number of variables in the output file
 #   <varname>    = name of the variable (this must be one of the
-#                  output variable names listed in vicNl_def.h.)
+#                  output variable names listed in vic_driver_shared.h.)
 #   <format>     = (for ascii output files) fprintf format string,
 #                  e.g.
 #                    %.4f = floating point with 4 decimal places
