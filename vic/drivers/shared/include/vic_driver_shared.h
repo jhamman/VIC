@@ -74,15 +74,15 @@ enum
     ALBEDO,      /**< surface albedo [fraction] */
     CATM,        /**< atmospheric CO2 concentration [ppm] */
     CHANNEL_IN,  /**< incoming channel flow [m3] */
+    FCANOPY,     /**< fractional area covered by plant canopy [fraction] */
     FDIR,        /**< fraction of incoming shortwave that is direct [fraction] */
     LAI_IN,      /**< leaf area index [m2/m2] */
-    LONGWAVE,    /**< incoming longwave radiation [W/m2] */
+    LWDOWN,      /**< incoming longwave radiation [W/m2] */
     PAR,         /**< incoming photosynthetically active radiation [W/m2] */
     PREC,        /**< total precipitation (rain and snow) [mm] */
     PRESSURE,    /**< atmospheric pressure [kPa] */
     VP,          /**< vapor pressure [kPa] */
-    SHORTWAVE,   /**< incoming shortwave [W/m2] */
-    VEGCOVER,    /**< fraction of each veg tile covered by plants [fraction] */
+    SWDOWN,      /**< incoming shortwave [W/m2] */
     WIND,        /**< wind speed [m/s] */
     SKIP,        /**< place holder for unused data columns */
     // Last value of enum - DO NOT ADD ANYTHING BELOW THIS LINE!!
@@ -201,8 +201,8 @@ enum
     OUT_LATENT,           /**< net upward latent heat flux [W/m2] */
     OUT_LATENT_SUB,       /**< net upward latent heat flux from sublimation [W/m2] */
     OUT_MELT_ENERGY,      /**< energy of fusion (melting) in snowpack [W/m2] */
-    OUT_NET_LONG,         /**< net downward longwave flux [W/m2] */
-    OUT_NET_SHORT,        /**< net downward shortwave flux [W/m2] */
+    OUT_LWNET,            /**< net downward longwave flux [W/m2] */
+    OUT_SWNET,            /**< net downward shortwave flux [W/m2] */
     OUT_R_NET,            /**< net downward radiation flux [W/m2] */
     OUT_RFRZ_ENERGY,      /**< net energy used to refreeze liquid water in snowpack [W/m2] */
     OUT_SENSIBLE,         /**< net upward sensible heat flux [W/m2] */
@@ -217,16 +217,16 @@ enum
     OUT_AIR_TEMP,         /**< air temperature [C] (ALMA_OUTPUT: [K])*/
     OUT_CATM,             /**< atmospheric CO2 concentrtaion [ppm]*/
     OUT_DENSITY,          /**< near-surface atmospheric density [kg/m3]*/
+    OUT_FCANOPY,          /**< fractional area covered by plant canopy [fraction] */
     OUT_FDIR,             /**< fraction of incoming shortwave that is direct [fraction]*/
     OUT_LAI,              /**< leaf area index [m2/m2] */
-    OUT_LONGWAVE,         /**< incoming longwave [W/m2] */
+    OUT_LWDOWN,           /**< incoming longwave [W/m2] */
     OUT_PAR,              /**< incoming photosynthetically active radiation [W/m2] */
     OUT_PRESSURE,         /**< near surface atmospheric pressure [kPa] (ALMA_OUTPUT: [Pa])*/
     OUT_QAIR,             /**< specific humidity [kg/kg] */
     OUT_REL_HUMID,        /**< relative humidity [%]*/
-    OUT_SHORTWAVE,        /**< incoming shortwave [W/m2] */
+    OUT_SWDOWN,           /**< incoming shortwave [W/m2] */
     OUT_SURF_COND,        /**< surface conductance [m/s] */
-    OUT_VEGCOVER,         /**< fractional area of plants [fraction] */
     OUT_VP,               /**< near surface vapor pressure [kPa] (ALMA_OUTPUT: [Pa]) */
     OUT_VPD,              /**< near surface vapor pressure deficit [kPa] (ALMA_OUTPUT: [Pa]) */
     OUT_WIND,             /**< near surface wind speed [m/s] */
@@ -240,8 +240,8 @@ enum
     OUT_LATENT_BAND,      /**< net upward latent heat flux [W/m2] */
     OUT_LATENT_SUB_BAND,  /**< net upward latent heat flux due to sublimation [W/m2] */
     OUT_MELT_ENERGY_BAND, /**< energy of fusion (melting) in snowpack [W/m2] */
-    OUT_NET_LONG_BAND,    /**< net downward longwave flux [W/m2] */
-    OUT_NET_SHORT_BAND,   /**< net downward shortwave flux [W/m2] */
+    OUT_LWNET_BAND,       /**< net downward longwave flux [W/m2] */
+    OUT_SWNET_BAND,       /**< net downward shortwave flux [W/m2] */
     OUT_RFRZ_ENERGY_BAND, /**< net energy used to refreeze liquid water in snowpack [W/m2] */
     OUT_SENSIBLE_BAND,    /**< net upward sensible heat flux [W/m2] */
     OUT_SNOW_CANOPY_BAND, /**< snow interception storage in canopy [mm] */
@@ -343,6 +343,7 @@ typedef struct {
     bool SIGNED;
     bool SUPPLIED;
     double multiplier;
+    char varname[MAXSTRING];
 } force_type_struct;
 
 /******************************************************************************
@@ -446,8 +447,10 @@ void collect_eb_terms(energy_bal_struct, snow_data_struct, cell_data_struct,
 void collect_wb_terms(cell_data_struct, veg_var_struct, snow_data_struct,
                       double, double, double, int, double, int, double *,
                       double *, out_data_struct *);
+void compute_lake_params(lake_con_struct *, soil_con_struct);
 void compute_treeline(atmos_data_struct *, dmy_struct *, double, double *,
                       bool *);
+size_t count_force_vars(FILE *gp);
 void cmd_proc(int argc, char **argv, char *globalfilename);
 void compress_files(char string[]);
 out_data_struct *create_output_list(void);
@@ -468,7 +471,6 @@ void free_dmy(dmy_struct **dmy);
 void free_out_data_files(out_data_file_struct **);
 void free_out_data(out_data_struct **);
 void free_vegcon(veg_con_struct **veg_con);
-double get_dist(double lat1, double long1, double lat2, double long2);
 void get_parameters(FILE *paramfile);
 void init_output_list(out_data_struct *out_data, int write, char *format,
                       int type, double mult);

@@ -68,16 +68,16 @@ enum
     CATM,
     CHANNEL_IN,
     DENSITY,
+    FCANOPY,
     FDIR,
     LAI_IN,
-    LONGWAVE,
+    LWDOWN,
     PAR,
     PREC,
     PRESSURE,
     QAIR,
     REL_HUMID,
-    SHORTWAVE,
-    VEGCOVER,
+    SWDOWN,
     VP,
     WIND,
     SKIP,
@@ -186,8 +186,8 @@ enum
     OUT_LATENT,
     OUT_LATENT_SUB,
     OUT_MELT_ENERGY,
-    OUT_NET_LONG,
-    OUT_NET_SHORT,
+    OUT_LWNET,
+    OUT_SWNET,
     OUT_R_NET,
     OUT_RFRZ_ENERGY,
     OUT_SENSIBLE,
@@ -202,17 +202,17 @@ enum
     OUT_CATM,
     OUT_COSZEN,
     OUT_DENSITY,
+    OUT_FCANOPY,
     OUT_FDIR,
     OUT_LAI,
-    OUT_LONGWAVE,
+    OUT_LWDOWN,
     OUT_PAR,
     OUT_PRESSURE,
     OUT_QAIR,
     OUT_REL_HUMID,
-    OUT_SHORTWAVE,
+    OUT_SWDOWN,
     OUT_SURF_COND,
     OUT_TSKC,
-    OUT_VEGCOVER,
     OUT_VP,
     OUT_VPD,
     OUT_WIND,
@@ -225,8 +225,8 @@ enum
     OUT_LATENT_BAND,
     OUT_LATENT_SUB_BAND,
     OUT_MELT_ENERGY_BAND,
-    OUT_NET_LONG_BAND,
-    OUT_NET_SHORT_BAND,
+    OUT_LWNET_BAND,
+    OUT_SWNET_BAND,
     OUT_RFRZ_ENERGY_BAND,
     OUT_SENSIBLE_BAND,
     OUT_SNOW_CANOPY_BAND,
@@ -364,14 +364,14 @@ typedef struct {
     _Bool TFALLBACK;
     _Bool BASEFLOW;
     unsigned short int GRID_DECIMAL;
+    _Bool VEGLIB_FCAN;
     _Bool VEGLIB_PHOTO;
-    _Bool VEGLIB_VEGCOVER;
     _Bool VEGPARAM_ALB;
+    _Bool VEGPARAM_FCAN;
     _Bool VEGPARAM_LAI;
-    _Bool VEGPARAM_VEGCOVER;
     unsigned short int ALB_SRC;
+    unsigned short int FCAN_SRC;
     unsigned short int LAI_SRC;
-    unsigned short int VEGCOVER_SRC;
     _Bool LAKE_PROFILE;
     _Bool ORGANIC_FRACT;
     _Bool BINARY_STATE_FILE;
@@ -645,7 +645,7 @@ typedef struct {
 typedef struct {
     _Bool overstory;
     double LAI[12];
-    double vegcover[12];
+    double fcanopy[12];
     double Wdmax[12];
     double albedo[12];
     double displacement[12];
@@ -672,7 +672,7 @@ typedef struct {
 typedef struct {
     double *albedo;
     double *LAI;
-    double *vegcover;
+    double *fcanopy;
 } veg_hist_struct;
 typedef struct {
     double *air_temp;
@@ -805,7 +805,7 @@ typedef struct {
     double canopyevap;
     double LAI;
     double throughfall;
-    double vegcover;
+    double fcanopy;
     double Wdew;
     double Wdmax;
     double *NscaleFactor;
@@ -1250,6 +1250,7 @@ typedef struct {
     _Bool SIGNED;
     _Bool SUPPLIED;
     double multiplier;
+    char varname[2048];
 } force_type_struct;
 typedef struct {
     force_type_struct TYPE[N_FORCING_TYPES];

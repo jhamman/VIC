@@ -48,6 +48,7 @@ vic_force(void)
     extern veg_con_struct    **veg_con;
     extern veg_hist_struct   **veg_hist;
     extern parameters_struct   param;
+    extern param_set_struct    param_set;
 
     double                     t_offset;
     double                    *dvar = NULL;
@@ -86,7 +87,8 @@ vic_force(void)
     // Air temperature: tas
     for (j = 0; j < NF; j++) {
         d3start[0] = global_param.forceoffset[0] + j;
-        get_scatter_nc_field_double(filenames.forcing[0], "tas",
+        get_scatter_nc_field_double(filenames.forcing[0],
+                                    param_set.TYPE[AIR_TEMP].varname,
                                     d3start, d3count, dvar);
         for (i = 0; i < local_domain.ncells_active; i++) {
             atmos[i].air_temp[j] = (double) dvar[i];
@@ -96,7 +98,8 @@ vic_force(void)
     // Precipitation: prcp
     for (j = 0; j < NF; j++) {
         d3start[0] = global_param.forceoffset[0] + j;
-        get_scatter_nc_field_double(filenames.forcing[0], "prcp",
+        get_scatter_nc_field_double(filenames.forcing[0],
+                                    param_set.TYPE[PREC].varname,
                                     d3start, d3count, dvar);
         for (i = 0; i < local_domain.ncells_active; i++) {
             atmos[i].prec[j] = (double) dvar[i];
@@ -106,7 +109,8 @@ vic_force(void)
     // Downward solar radiation: dswrf
     for (j = 0; j < NF; j++) {
         d3start[0] = global_param.forceoffset[0] + j;
-        get_scatter_nc_field_double(filenames.forcing[0], "dswrf",
+        get_scatter_nc_field_double(filenames.forcing[0],
+                                    param_set.TYPE[SWDOWN].varname,
                                     d3start, d3count, dvar);
         for (i = 0; i < local_domain.ncells_active; i++) {
             atmos[i].shortwave[j] = (double) dvar[i];
@@ -116,7 +120,8 @@ vic_force(void)
     // Downward longwave radiation: dlwrf
     for (j = 0; j < NF; j++) {
         d3start[0] = global_param.forceoffset[0] + j;
-        get_scatter_nc_field_double(filenames.forcing[0], "dlwrf",
+        get_scatter_nc_field_double(filenames.forcing[0],
+                                    param_set.TYPE[LWDOWN].varname,
                                     d3start, d3count, dvar);
         for (i = 0; i < local_domain.ncells_active; i++) {
             atmos[i].longwave[j] = (double) dvar[i];
@@ -136,7 +141,8 @@ vic_force(void)
     // Specific humidity: shum
     for (j = 0; j < NF; j++) {
         d3start[0] = global_param.forceoffset[0] + j;
-        get_scatter_nc_field_double(filenames.forcing[0], "shum",
+        get_scatter_nc_field_double(filenames.forcing[0],
+                                    param_set.TYPE[VP].varname,
                                     d3start, d3count, dvar);
         for (i = 0; i < local_domain.ncells_active; i++) {
             atmos[i].vp[j] = (double) dvar[i];
@@ -146,7 +152,8 @@ vic_force(void)
     // Pressure: pressure
     for (j = 0; j < NF; j++) {
         d3start[0] = global_param.forceoffset[0] + j;
-        get_scatter_nc_field_double(filenames.forcing[0], "pres",
+        get_scatter_nc_field_double(filenames.forcing[0],
+                                    param_set.TYPE[PRESSURE].varname,
                                     d3start, d3count, dvar);
         for (i = 0; i < local_domain.ncells_active; i++) {
             atmos[i].pressure[j] = (double) dvar[i];
@@ -155,9 +162,13 @@ vic_force(void)
     // Optional inputs
     if (options.LAKES) {
         // Channel inflow to lake
+        d3start[0] = global_param.forceoffset[0] + j;
+        get_scatter_nc_field_double(filenames.forcing[0],
+                                    param_set.TYPE[CHANNEL_IN].varname,
+                                    d3start, d3count, dvar);
         for (j = 0; j < NF; j++) {
             for (i = 0; i < local_domain.ncells_active; i++) {
-                atmos[i].channel_in[j] = 0;
+                atmos[i].channel_in[j] = (double) dvar[i];
             }
         }
     }
@@ -165,7 +176,8 @@ vic_force(void)
         // Atmospheric CO2 mixing ratio
         for (j = 0; j < NF; j++) {
             d3start[0] = global_param.forceoffset[0] + j;
-            get_scatter_nc_field_double(filenames.forcing[0], "catm",
+            get_scatter_nc_field_double(filenames.forcing[0],
+                                        param_set.TYPE[CATM].varname,
                                         d3start, d3count, dvar);
             for (i = 0; i < local_domain.ncells_active; i++) {
                 atmos[i].Catm[j] = (double) dvar[i];
@@ -174,7 +186,8 @@ vic_force(void)
         // Fraction of shortwave that is direct
         for (j = 0; j < NF; j++) {
             d3start[0] = global_param.forceoffset[0] + j;
-            get_scatter_nc_field_double(filenames.forcing[0], "fdir",
+            get_scatter_nc_field_double(filenames.forcing[0],
+                                        param_set.TYPE[FDIR].varname,
                                         d3start, d3count, dvar);
             for (i = 0; i < local_domain.ncells_active; i++) {
                 atmos[i].fdir[j] = (double) dvar[i];
@@ -183,7 +196,8 @@ vic_force(void)
         // Photosynthetically active radiation
         for (j = 0; j < NF; j++) {
             d3start[0] = global_param.forceoffset[0] + j;
-            get_scatter_nc_field_double(filenames.forcing[0], "par",
+            get_scatter_nc_field_double(filenames.forcing[0],
+                                        param_set.TYPE[PAR].varname,
                                         d3start, d3count, dvar);
             for (i = 0; i < local_domain.ncells_active; i++) {
                 atmos[i].par[j] = (double) dvar[i];
@@ -206,8 +220,8 @@ vic_force(void)
                         veg_con[i][vidx].albedo[dmy[current].month - 1];
                     veg_hist[i][vidx].LAI[j] =
                         veg_con[i][vidx].LAI[dmy[current].month - 1];
-                    veg_hist[i][vidx].vegcover[j] =
-                        veg_con[i][vidx].vegcover[dmy[current].month - 1];
+                    veg_hist[i][vidx].fcanopy[j] =
+                        veg_con[i][vidx].fcanopy[dmy[current].month - 1];
                 }
             }
         }
@@ -215,7 +229,7 @@ vic_force(void)
 
     // Read veg_hist file
     if (options.LAI_SRC == FROM_VEGHIST ||
-        options.VEGCOVER_SRC == FROM_VEGHIST ||
+        options.FCAN_SRC == FROM_VEGHIST ||
         options.ALB_SRC == FROM_VEGHIST) {
         // for now forcing file is determined by the year
         sprintf(filenames.forcing[1], "%s%4d.nc", filenames.f_path_pfx[1],
@@ -254,7 +268,7 @@ vic_force(void)
         }
 
         // Partial veg cover fraction: fcov
-        if (options.VEGCOVER_SRC == FROM_VEGHIST) {
+        if (options.FCAN_SRC == FROM_VEGHIST) {
             for (j = 0; j < NF; j++) {
                 d4start[0] = global_param.forceoffset[1] + j;
                 for (v = 0; v < options.NVEGTYPES; v++) {
@@ -264,7 +278,7 @@ vic_force(void)
                     for (i = 0; i < local_domain.ncells_active; i++) {
                         vidx = veg_con_map[i].vidx[v];
                         if (vidx != -1) {
-                            veg_hist[i][vidx].vegcover[j] = (double) dvar[i];
+                            veg_hist[i][vidx].fcanopy[j] = (double) dvar[i];
                         }
                     }
                 }
@@ -321,17 +335,17 @@ vic_force(void)
                                                 param.SNOW_MAX_SNOW_TEMP,
                                                 &(atmos[i].prec[j]), 1);
         }
-        // Check on vegcover
+        // Check on fcanopy
         for (v = 0; v < options.NVEGTYPES; v++) {
             vidx = veg_con_map[i].vidx[v];
             if (vidx != -1) {
                 for (j = 0; j < NF; j++) {
-                    if (veg_hist[i][vidx].vegcover[j] < MIN_VEGCOVER) {
+                    if (veg_hist[i][vidx].fcanopy[j] < MIN_FCANOPY) {
                         log_warn(
-                            "cell %zu, veg %d substep %zu vegcover %f < minimum of %f; setting = %f\n", i, vidx, j,
-                            veg_hist[i][vidx].vegcover[j], MIN_VEGCOVER,
-                            MIN_VEGCOVER);
-                        veg_hist[i][vidx].vegcover[j] = MIN_VEGCOVER;
+                            "cell %zu, veg %d substep %zu fcanopy %f < minimum of %f; setting = %f\n", i, vidx, j,
+                            veg_hist[i][vidx].fcanopy[j], MIN_FCANOPY,
+                            MIN_FCANOPY);
+                        veg_hist[i][vidx].fcanopy[j] = MIN_FCANOPY;
                     }
                 }
             }
@@ -365,8 +379,8 @@ vic_force(void)
                 veg_hist[i][vidx].albedo[NR] = average(veg_hist[i][vidx].albedo,
                                                        NF);
                 veg_hist[i][vidx].LAI[NR] = average(veg_hist[i][vidx].LAI, NF);
-                veg_hist[i][vidx].vegcover[NR] = average(
-                    veg_hist[i][vidx].vegcover, NF);
+                veg_hist[i][vidx].fcanopy[NR] = average(
+                    veg_hist[i][vidx].fcanopy, NF);
             }
         }
 
@@ -463,5 +477,4 @@ get_forcing_file_info(param_set_struct *param_set,
     // Free attribute character arrays
     free(nc_unit_chars);
     free(calendar_char);
-
 }
