@@ -1,0 +1,121 @@
+#!/usr/bin/env python
+'''VIC case setup command line interface'''
+import argparse
+import os
+import errno
+import shutil
+from datetime import datetime
+import getpass
+import socket
+from make_version import git_version
+
+readme_template = '''
+{casename}
+===========================
+
+VIC Driver      : {driver}
+
+User            : {user}
+
+Host            : {host}
+
+Setup Date/Time : {time}
+
+VIC Version     : {version}
+
+----------------------------
+
+#### Case Description
+
+Add case description here
+
+----------------------------
+
+#### Case Status
+
+{time} : Case Created
+'''
+
+
+def main():
+    '''
+    Setup VIC case
+    '''
+    # Parse arguments
+    parser = argparse.ArgumentParser(description='Setup script for VIC run')
+    parser.add_argument('--driver', type=str, help='VIC driver to use',
+                        choices=['classic', 'image'],
+                        required=True)
+    parser.add_argument('--casename', type=str, help='Run case name',
+                        required=True)
+    args = parser.parse_args()
+
+    # Define directory names
+    scripts_root = os.path.dirname(os.path.realpath(__file__))
+    vic_root = os.path.join(scripts_root, os.pardir)
+    case_dir = os.path.join(scripts_root, args.casename)
+
+    # Get some environment variables and version info
+    user = getpass.getuser()
+    host = socket.gethostname()
+    version = git_version()
+
+    if os.path.exists(case_dir):
+        raise ValueError('Casedir "{0}" already exists'.format(
+                         args.casename))
+    else:
+        mkdir_p(case_dir)
+
+    # Make case dir and subdirs
+    dirs = {}
+    for d in ['Build', 'CaseDocs', 'bin', 'logs', 'timing']:
+        dirs[d] = os.path.join(scripts_root, args.casename, d)
+        mkdir_p(dirs[d])
+    blddirs = {}
+    for d in ['obj', 'logs']:
+        blddirs[d] = os.path.join(dirs['Build'], d)
+        mkdir_p(blddirs[d])
+
+    # Copy Makefiles to $CASE/Build dir
+    makefile = os.path.join(dirs['Build'], 'Makefile')
+    shutil.copy(os.path.join(vic_root, 'vic/drivers', args.driver,
+                             'bld/Makefile'),
+                makefile)
+
+    # Copy sample global file
+    paramfile = os.path.join(case_dir,
+                             '{0}_global_param.txt'.format(args.casename))
+    shutil.copy(os.path.join(vic_root, 'samples/global.param.sample'),
+                paramfile)
+
+    # Create build and run scripts
+    for script in ['build', 'run']:
+        fname = os.path.join(case_dir, '{0}.{1}'.format(args.casename, script))
+        shutil.copy('case_utils/templates/case_{0}_template.py'.format(script),
+                    fname)
+
+    # Create readme file
+    now = datetime.now().isoformat()
+    kwargs = dict(casename=args.casename, driver=args.driver, user=user,
+                  time=now, version=version.full, host=host)
+    with open(os.path.join(case_dir,
+                           '{0}.readme.md'.format(args.casename)), 'w') as f:
+        f.write(readme_template.format(**kwargs))
+
+
+def mkdir_p(path):
+    try:
+        os.makedirs(path)
+    except OSError as exc:  # Python >2.5
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else:
+            raise
+
+
+if __name__ == '__main__':
+    cwd = os.getcwd()
+    scriptdir = os.path.dirname(os.path.realpath(__file__))
+    os.chdir(scriptdir)
+    main()
+    os.chdir(cwd)
