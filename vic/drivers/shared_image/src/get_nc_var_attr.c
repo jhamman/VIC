@@ -65,15 +65,15 @@ get_nc_var_attr(char  *nc_name,
         log_err("Memory allocation error in get_nc_var_attr().");
     }
 
-    // we need to null terminate the string ourselves according to NetCDF docs
-    (*attr)[attr_len] = '\0';
-
     // read attribute text
     status = nc_get_att_text(nc_id, var_id, attr_name, *attr);
     if (status != NC_NOERR) {
         log_err("Error getting netCDF attribute %s for var %s in %s", attr_name,
                 var_name, nc_name);
     }
+
+    // we need to null terminate the string ourselves according to NetCDF docs
+    (*attr)[attr_len] = '\0';
 
     // close the netcdf file
     status = nc_close(nc_id);
