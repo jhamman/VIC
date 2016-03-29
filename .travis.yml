@@ -9,13 +9,23 @@ matrix:
   # Image Driver
   - compiler: gcc
     os: linux
-    env: TESTID='image'
+    env: TESTID='image' TRAVIS_MPI='mpich'
     addons:
       apt_packages:
         - libnetcdf-dev
         - gfortran
         - valgrind
-        # open-mpi is built from source in image.travis
+        # mpich is built from source in image.travis
+  - compiler: gcc
+    os: linux
+    env: TESTID='image' TRAVIS_MPI='openmpi'
+    addons:
+      apt_packages:
+        - libnetcdf-dev
+        - gfortran
+        - valgrind
+        - openmpi-bin
+        - libopenmpi-dev
   # CESM Driver
   - compiler: gcc
     os: linux
@@ -25,7 +35,7 @@ matrix:
         - libnetcdf-dev
         - gfortran
         - valgrind
-        # open-mpi is built from source in cesm.travis
+        # mpich is built from source in cesm.travis
   # Classic Driver
   - compiler: clang
     os: linux
