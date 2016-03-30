@@ -50,7 +50,7 @@ function vic_before_install {
         elif [ "$TRAVIS_MPI" = "openmpi" ]; then
             export TRAVIS_MPIPATH=/usr
         else
-            echo "Did not specify an mpi library, exiting..."
+            echo "Did not specify a mpi library, exiting..."
             exit 1
         fi
         find ${TRAVIS_MPIPATH} -name mpicc

@@ -29,13 +29,23 @@ matrix:
   # CESM Driver
   - compiler: gcc
     os: linux
-    env: TESTID='cesm'
+    env: TESTID='cesm' TRAVIS_MPI='mpich'
     addons:
       apt_packages:
         - libnetcdf-dev
         - gfortran
         - valgrind
         # mpich is built from source in cesm.travis
+  - compiler: gcc
+    os: linux
+    env: TESTID='cesm' TRAVIS_MPI='openmpi'
+    addons:
+      apt_packages:
+        - libnetcdf-dev
+        - gfortran
+        - valgrind
+        - openmpi-bin
+        - libopenmpi-dev
   # Classic Driver
   - compiler: clang
     os: linux
@@ -65,6 +75,36 @@ matrix:
           - valgrind
         sources:
           - ubuntu-toolchain-r-test
+  - compiler: clang
+    os: linux
+    env: TESTID=classic USE_CC=clang-3.6
+    addons:
+      apt:
+        packages:
+          - clang-3.6
+          - valgrind
+        sources:
+          - llvm-toolchain-precise-3.6
+          - ubuntu-toolchain-r-test
+  allow_failures:
+  - compiler: gcc
+    os: linux
+    env: TESTID='image' TRAVIS_MPI='mpich'
+    addons:
+      apt_packages:
+        - libnetcdf-dev
+        - gfortran
+        - valgrind
+        # mpich is built from source in image.travis
+  - compiler: gcc
+    os: linux
+    env: TESTID='cesm' TRAVIS_MPI='mpich'
+    addons:
+      apt_packages:
+        - libnetcdf-dev
+        - gfortran
+        - valgrind
+        # mpich is built from source in cesm.travis
   - compiler: clang
     os: linux
     env: TESTID=classic USE_CC=clang-3.6

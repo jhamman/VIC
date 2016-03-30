@@ -32,19 +32,24 @@ function vic_before_install {
 		export TRAVIS_NETCDFPATH=/usr/local
 		export TRAVIS_MPIPATH=/usr/local
     else
-		export TRAVIS_NETCDFPATH=/usr
-		export TRAVIS_MPIPATH="${HOME}/mpich"
+        export TRAVIS_NETCDFPATH=/usr
 
-        # Install MPICH
-        if [ ! -d ${TRAVIS_MPIPATH} ]; then
-            install_mpich
+        if [ "$TRAVIS_MPI" = "mpich" ]; then
+		    export TRAVIS_MPIPATH="${HOME}/mpich"
+            # Install MPICH
+            if [ ! -d ${TRAVIS_MPIPATH} ]; then
+                install_mpich
+            else
+                echo "MPICH installed..."
+            fi
+        elif [ "$TRAVIS_MPI" = "openmpi" ]; then
+            export TRAVIS_MPIPATH=/usr
         else
-            echo "MPICH installed..."
+            echo "Did not specify a mpi library, exiting..."
+            exit 1
         fi
-        find ${TRAVIS_MPIPATH} -name mpiexec
         find ${TRAVIS_MPIPATH} -name mpicc
 	fi
-
 }
 
 function vic_install {
