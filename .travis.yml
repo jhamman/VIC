@@ -26,6 +26,15 @@ matrix:
         - valgrind
         - openmpi-bin
         - libopenmpi-dev
+  - compiler: clang
+    os: linux
+    env: TESTID='image' TRAVIS_MPI='openmpi'
+    addons:
+      apt_packages:
+        - libnetcdf-dev
+        - valgrind
+        - openmpi-bin
+        - libopenmpi-dev
   # CESM Driver
   - compiler: gcc
     os: linux
