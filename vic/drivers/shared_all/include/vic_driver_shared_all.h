@@ -434,6 +434,18 @@ typedef struct {
     veg_var_struct *veg_var;
 } Error_struct;
 
+/******************************************************************************
+ * @brief   This structure holds timer information for profiling
+ *****************************************************************************/
+typedef struct {
+    double start_wall;
+    double start_cpu;
+    double stop_wall;
+    double stop_cpu;
+    double delta_wall;
+    double delta_cpu;
+} timer_struct;
+
 double air_density(double t, double p);
 double all_30_day_from_dmy(dmy_struct *dmy);
 double all_leap_from_dmy(dmy_struct *dmy);
@@ -478,7 +490,9 @@ void generate_default_state(all_vars_struct *, soil_con_struct *,
                             veg_con_struct *);
 void generate_default_lake_state(all_vars_struct *, soil_con_struct *,
                                  lake_con_struct);
+double get_cpu_time();
 void get_parameters(FILE *paramfile);
+double get_wall_time();
 void init_output_list(out_data_struct *out_data, int write, char *format,
                       int type, double mult);
 void initialize_energy(energy_bal_struct **energy, size_t nveg);
@@ -545,6 +559,8 @@ int set_output_var(out_data_file_struct *, int, int, out_data_struct *, char *,
 void soil_moisture_from_water_table(soil_con_struct *soil_con, size_t nlayers);
 void sprint_dmy(char *str, dmy_struct *dmy);
 unsigned short int timeunits_from_chars(char *units_chars);
+void timer_start(timer_struct *t);
+void timer_stop(timer_struct *t);
 int update_step_vars(all_vars_struct *, veg_con_struct *, veg_hist_struct *);
 int invalid_date(unsigned short int calendar, dmy_struct *dmy);
 void validate_parameters(void);
