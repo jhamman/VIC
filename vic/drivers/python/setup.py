@@ -28,10 +28,10 @@ MINOR = 0
 MICRO = 0
 ISRELEASED = True
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
-QUALIFIER = 'rc1'
+QUALIFIER = 'rc2'
 
 FULLVERSION = VERSION
-write_version = False
+write_version = True
 write_headers = True
 
 vic_root_rel_path = os.path.join(os.pardir, os.pardir, os.pardir)
