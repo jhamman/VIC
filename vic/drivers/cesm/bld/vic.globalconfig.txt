@@ -54,8 +54,13 @@ DOMAIN_TYPE      FRAC    frac
 DOMAIN_TYPE      YDIM    nj
 DOMAIN_TYPE      XDIM    ni
 
-OUTFILE     fluxes
+# Statefile Information
+STATENAME    {caseid}.vic.r
+STATE_FORMAT NETCDF4_CLASSIC
+
+OUTFILE     {caseid}.vic.h0
 AGGFREQ     NDAYS 1
+OUTFREQ     NDAYS 1
 OUT_FORMAT  NETCDF4_CLASSIC
 OUTVAR      OUT_PREC
 OUTVAR      OUT_RAINF

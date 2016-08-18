@@ -234,11 +234,14 @@ get_global_param(FILE *gp)
                 }
             }
 
-            /*************************************
-               Define log directory
-            *************************************/
+            // Define log directory
             else if (strcasecmp("LOG_DIR", optstr) == 0) {
                 sscanf(cmdstr, "%*s %s", filenames.log_path);
+            }
+
+            // Define state file names/paths
+            else if (strcasecmp("STATENAME", optstr) == 0) {
+                sscanf(cmdstr, "%*s %s", filenames.statefile);
             }
             else if (strcasecmp("INIT_STATE", optstr) == 0) {
                 sscanf(cmdstr, "%*s %s", flgstr);
