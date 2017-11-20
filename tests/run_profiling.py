@@ -42,8 +42,8 @@ VIC Global Parameter File : $vic_global
 VIC Executable Version Info
 ---------------------------
 $vic_version
-Cores | Time (Seconds)
-----------------------
+Cores | Threads | Time (Seconds)
+--------------------------------
 '''
 
 
@@ -112,36 +112,55 @@ mpiexec_mpt -np ${BC_MPI_TASKS_ALLOC} $vic_exe -g $vic_global
 END=$(date +%s)
 DIFF=$(echo "$END - $START" | bc)
 printf "%5s | %f\n" ${BC_MPI_TASKS_ALLOC} $DIFF >> $timing_table_file'''),
-    'thunder': host_config(profile=[dict(select=1, mpiprocs=36),
-                                    dict(select=2, mpiprocs=36),
-                                    dict(select=3, mpiprocs=36),
-                                    dict(select=4, mpiprocs=36),
-                                    dict(select=5, mpiprocs=36),
-                                    dict(select=6, mpiprocs=36),
-                                    dict(select=8, mpiprocs=36),
-                                    dict(select=10, mpiprocs=36),
-                                    dict(select=12, mpiprocs=36)],
-                           submit='qsub', mpiexec='mpiexec_mpt',
+    'thunder': host_config(profile=[
+        dict(select=1, mpiprocs=1, ompthreads=36),  # hybrid jobs
+        dict(select=2, mpiprocs=1, ompthreads=36),
+        dict(select=4, mpiprocs=1, ompthreads=36),
+        dict(select=8, mpiprocs=1, ompthreads=36),
+        dict(select=16, mpiprocs=1, ompthreads=36),
+        dict(select=32, mpiprocs=1, ompthreads=36),
+        dict(select=1, mpiprocs=1, ompthreads=72),  # try hyperthreading too
+        dict(select=2, mpiprocs=1, ompthreads=72),
+        dict(select=4, mpiprocs=1, ompthreads=72),
+        dict(select=1, mpiprocs=36, ompthreads=1),  # mpi only
+        dict(select=2, mpiprocs=36, ompthreads=1),
+        dict(select=4, mpiprocs=36, ompthreads=1),
+        dict(select=8, mpiprocs=36, ompthreads=1),
+        dict(select=16, mpiprocs=36, ompthreads=1),
+        dict(select=32, mpiprocs=36, ompthreads=1)],
+                           submit='qsub',
+                           mpiexec='mpiexec_mpt -n ${BC_MPI_TASKS_ALLOC} omplace',
                            template='''#!/bin/bash
-#!/bin/bash
 #PBS -N VIC$i
-#PBS -q standard
-#PBS -A NPSCA07935242
+#PBS -q frontier
+#PBS -A NPSCA07935YF5
 #PBS -l application=VIC
-#PBS -l select=$select:ncpus=36:mpiprocs=$mpiprocs
+#PBS -l select=$select:ncpus=36:mpiprocs=$mpiprocs:ompthreads=$ompthreads
 #PBS -l walltime=35:00:00
 #PBS -j oe
 
 # Qsub template for AFRL THUNDER
 # Scheduler: PBS
 
+# load environment modules used during compilation
+module load intel-compilers/15.0.3.187
+module load mpt/2.12
 module load netcdf-fortran/intel/4.4.2
 
+echo "Parallel Environment settings:"
+echo "------------------------------"
+echo "OMP_NUM_THREADS    : $OMP_NUM_THREADS"
+echo "MPI_DSM_DISTRIBUTE : $MPI_DSM_DISTRIBUTE"
+echo "BC_CORES_PER_NODE  : $BC_CORES_PER_NODE"
+echo "BC_MEM_PER_NODE    : $BC_MEM_PER_NODE"
+echo "BC_MPI_TASKS_ALLOC : $BC_MPI_TASKS_ALLOC"
+echo "BC_NODE_ALLOC      : $BC_NODE_ALLOC"
+
 START=$(date +%s)
-mpiexec_mpt -np ${BC_MPI_TASKS_ALLOC} $vic_exe -g $vic_global
+$mpiexec $vic_exe -g $vic_global
 END=$(date +%s)
 DIFF=$(echo "$END - $START" | bc)
-printf "%5s | %f\n" ${BC_MPI_TASKS_ALLOC} $DIFF >> $timing_table_file'''),
+printf "%5s | %5s | %f\\n" $BC_MPI_TASKS_ALLOC $OMP_NUM_THREADS $DIFF >> $timing_table_file'''),
     'gordon': host_config(profile=[dict(select=1, mpiprocs=32),
                                    dict(select=2, mpiprocs=32),
                                    dict(select=3, mpiprocs=32),
@@ -171,22 +190,32 @@ aprun -n ${BC_MPI_TASKS_ALLOC} $vic_exe -g $vic_global
 END=$(date +%s)
 DIFF=$(echo "$END - $START" | bc)
 printf "%5s | %f\n" ${BC_MPI_TASKS_ALLOC} $DIFF >> $timing_table_file'''),
-    'cheyenne': host_config(profile=[dict(select=1, mpiprocs=36),
-                                     dict(select=2, mpiprocs=36),
-                                     dict(select=3, mpiprocs=36),
-                                     dict(select=4, mpiprocs=36),
-                                     dict(select=5, mpiprocs=36),
-                                     dict(select=6, mpiprocs=36),
-                                     dict(select=8, mpiprocs=36),
-                                     dict(select=10, mpiprocs=36),
-                                     dict(select=12, mpiprocs=36)],
-                            submit='qsub', mpiexec='mpiexec_mpt',
+    'cheyenne': host_config(profile=[
+        dict(select=1, mpiprocs=1, ompthreads=36),
+        dict(select=2, mpiprocs=1, ompthreads=36),
+        dict(select=3, mpiprocs=1, ompthreads=36),
+        dict(select=4, mpiprocs=1, ompthreads=36),
+        dict(select=5, mpiprocs=1, ompthreads=36),
+        dict(select=6, mpiprocs=1, ompthreads=36),
+        dict(select=8, mpiprocs=1, ompthreads=36),
+        dict(select=10, mpiprocs=1, ompthreads=36),
+        dict(select=12, mpiprocs=1, ompthreads=36),
+        dict(select=1, mpiprocs=36, ompthreads=1),
+        dict(select=2, mpiprocs=36, ompthreads=1),
+        dict(select=3, mpiprocs=36, ompthreads=1),
+        dict(select=4, mpiprocs=36, ompthreads=1),
+        dict(select=5, mpiprocs=36, ompthreads=1),
+        dict(select=6, mpiprocs=36, ompthreads=1),
+        dict(select=8, mpiprocs=36, ompthreads=1),
+        dict(select=10, mpiprocs=36, ompthreads=1),
+        dict(select=12, mpiprocs=36, ompthreads=1)],
+                            submit='qsub', mpiexec='mpiexec_mpt omplace',
                             template='''#!/bin/bash
 #!/bin/bash
 #PBS -N VIC$i
 #PBS -q regular
 #PBS -A P48500028
-#PBS -l select=$select:ncpus=36:mpiprocs=$mpiprocs
+#PBS -l select=$select:ncpus=36:mpiprocs=$mpiprocs:ompthreads:$ompthreads
 #PBS -l walltime=12:00:00
 #PBS -j oe
 #PBS -m abe
@@ -194,12 +223,13 @@ printf "%5s | %f\n" ${BC_MPI_TASKS_ALLOC} $DIFF >> $timing_table_file'''),
 # Qsub template for UCAR CHEYENNE
 # Scheduler: PBS
 
-START=$(date +%s)
+BC_MPI_TASKS_ALLOC=$mpiprocs
 
+START=$(date +%s)
 $mpiexec $vic_exe -g $vic_global
 END=$(date +%s)
 DIFF=$(echo "$END - $START" | bc)
-printf "%5s | %f\n" ${BC_MPI_TASKS_ALLOC} $DIFF >> $timing_table_file''')
+printf "%5s | %5s | %f\\n" ${BC_MPI_TASKS_ALLOC} ${OMP_NUM_THREADS} $DIFF >> $timing_table_file'''),
 }
 
 OUT_WIDTH = 100
